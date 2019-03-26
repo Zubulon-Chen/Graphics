@@ -189,8 +189,8 @@ void Widget::paintEvent(QPaintEvent *)
     painter.drawLine(0,2*hh,wid,2*hh);
 
     //线段裁剪测试
-    //    line_clip_test(painter);
+        line_clip_test(painter);
     //多边形裁剪测试
-    polygen_clip_test(painter);
+//    polygen_clip_test(painter);
 
 }
