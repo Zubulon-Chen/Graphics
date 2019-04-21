@@ -11,6 +11,8 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QToolTip>
+#include <QInputDialog>
+#include <QDebug>
 
 namespace Ui {
 class Widget;
@@ -31,12 +33,20 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
+private slots:
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
 private:
     Ui::Widget *ui;
+    int numPoints;
     QVector<QPoint> points;
     int idx;
     bool change;
     int m,m_mouse_style,j;
+    bool click_points;
+    bool delete_point;
 };
 
 #endif // WIDGET_H
