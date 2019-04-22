@@ -5,14 +5,16 @@
 #include <QVector>
 #include <QList>
 #include <QPainter>
+#include <algorithm>
+using namespace std;
 namespace Ui {
 class Widget;
 }
 struct edge
 {
-    int ymax;
-    double xmin;
-    double dx;
+    int ymax;//上端点的y值
+    double xmin;//左端点的x值
+    double dx;//斜率的倒数，y的一个增量对应的x的增量
     edge() {}
     edge(int yy,double xx,double dd):ymax(yy),xmin(xx),dx(dd) {}
 };
@@ -36,10 +38,10 @@ protected:
     void paintEvent(QPaintEvent *event);
 private:
     Ui::Widget *ui;
-    QVector<QList<edge>> ET;
-    QList<edge> AET;
+    QVector<QList<edge>> ET;//边表，记录所有边的信息
+    QList<edge> AET;//活性边表，与当前扫描线相交的边
     int winHeight,winWidth;
-    QVector<point> vertices;
+    QVector<point> vertices;//多边形的顶点集合
 };
 
 #endif // WIDGET_H
