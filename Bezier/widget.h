@@ -40,13 +40,12 @@ private slots:
 
 private:
     Ui::Widget *ui;
-    int numPoints;
+    int numPoints;//记录输出顶点个数
     QVector<QPoint> points;
-    int idx;
-    bool change;
-    int m,m_mouse_style,j;
-    bool click_points;
-    bool delete_point;
+    int idx;//选中的是哪个顶点
+    bool change;//顶点是否变动
+    bool click_points;//是否还在添加顶点
+    bool delete_point;//是否在删除顶点
 };
 
 #endif // WIDGET_H

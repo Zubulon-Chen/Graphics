@@ -7,7 +7,7 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
 //    setFixedSize(1000,800);
-    points={QPoint(100,300),QPoint(250,100),QPoint(400,100),QPoint(600,500)};
+//    points={QPoint(100,300),QPoint(250,100),QPoint(400,100),QPoint(600,500)};
     idx=0;
     change=false;
     m=0;
@@ -29,10 +29,10 @@ void Widget::drawLines(const QVector<QPoint> &points,QPainter &painter)
 void Widget::drawBezier(QPainter &painter)
 {
     QVector<QPoint> ppp=points;
-    painter.setPen(QPen(Qt::darkGreen, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     drawLines(points,painter);
     QVector<QPoint> pp;
-    painter.setPen(QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     for(double t=0.0;t<=1.0;t+=0.001){
         points=ppp;
         while(points.size()>1){
@@ -54,7 +54,13 @@ void Widget::drawBezier(QPainter &painter)
 void Widget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-    qDebug()<<"paint event\n";
+    QPen pen;
+    pen.setColor(Qt::darkGreen);
+    pen.setWidth(10);
+    painter.setPen(pen);
+    for(auto point:points){
+        painter.drawPoint(point);
+    }
     if(!click_points)
         drawBezier(painter);
 }
@@ -62,11 +68,10 @@ void Widget::paintEvent(QPaintEvent *)
 void Widget::mousePressEvent(QMouseEvent *event)
 {
     if(event->button()==Qt::LeftButton){
-        qDebug()<<"press event\n";
         if(click_points){
             points.push_back(event->pos());
+            update();
             if(points.size()==numPoints){
-
                 click_points=false;
                 update();
             }
@@ -87,9 +92,7 @@ void Widget::mousePressEvent(QMouseEvent *event)
             for(int i=0;i<points.size();i++){
                 if(abs(event->pos().x()-points[i].x())<=5
                         &&abs(event->pos().y()-points[i].y())<=5){
-
                     idx=i;
-
                     change=true;
                     setCursor(Qt::CrossCursor);
                     break;
@@ -104,24 +107,9 @@ void Widget::mousePressEvent(QMouseEvent *event)
 
 void Widget::mouseMoveEvent(QMouseEvent *event)
 {
-    m=0;  //还应该在这在给m 赋一次值 为了清空鼠标上一次在某个点上留下的值
     QString text=QString("%1 %2").arg(event->pos().x()).arg(event->pos().y());
-    QToolTip::showText(QPoint(event->globalPos()),text,this);  //显示鼠标坐标  更随鼠标用方框的形式
-    for(int i=0;i<points.size();i++){
-        if(fabs(event->pos().x()-points[i].x())<=5&& fabs(event->pos().y()-points[i].y())<=5){
-
-            m=m+1;
-
-        }}
-
-    if(m!=0) {
-        setCursor(Qt::CrossCursor);  //改变鼠标的样式
-        update();  //刷新
-    }else {
-        setCursor(Qt::ArrowCursor);
-        update();
-    }
-    if(change){  //改变点的位置
+    QToolTip::showText(QPoint(event->globalPos()),text,this);  //显示鼠标坐标,更随鼠标用方框的形式
+    if(change){  //改变点的位置，paintEvent调用update实时更新
         points[idx]=QPoint(event->pos().x(),event->pos().y());
         update();
     }
@@ -130,6 +118,7 @@ void Widget::mouseMoveEvent(QMouseEvent *event)
 void Widget::mouseReleaseEvent(QMouseEvent *event)
 {
     setCursor(Qt::ArrowCursor);
+    change=false;
     update();
 }
 
