@@ -76,16 +76,13 @@ void Widget::drawB_Spline(QPainter &painter)
         knots[i]=i-p;
     for(int i=n;i<n+p+1;i++)
         knots[i]=p;
-
-    QVector<QPoint> ppp=points;
     QVector<QPoint> pp;
-
-
     painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    for(double u=knots[p];u<knots[points.size()];u+=0.01){
-        points=ppp;
+    for(double u=knots[p];u<knots[points.size()+1];u+=0.01){
         pp.clear();
+        //找到当前u在哪个节点区间内
         int k=std::distance(knots.begin(),std::upper_bound(knots.begin(),knots.end(),u))-1;
+        //区间[uk,uk+1)对应的控制顶点[Pk-p,Pk]
         for(int i=k-p;i<k+1;i++)
             pp.push_back(points[i]);
         for(int r=1;r<=p;r++){
@@ -93,7 +90,6 @@ void Widget::drawB_Spline(QPainter &painter)
                 double alpha = u - knots[i];
                 double dev = (knots[i+p+1-r]-knots[i]);
                 alpha = (dev !=0)? alpha / dev : 0;
-
                 pp[j] = (1.0 - alpha)*pp[j - 1] + alpha * pp[j];
             }
         }
