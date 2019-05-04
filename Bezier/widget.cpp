@@ -70,21 +70,26 @@ void Widget::drawB_Spline(QPainter &painter)
 //        knots[i]=i;
     //clamped效果
     //第一个和最后一个节点重复度p+1
+    //中间有n-p-1个节点均匀分布
     for(int i=0;i<p+1;i++)
         knots[i]=0;
     for(int i=p+1;i<n;i++)
         knots[i]=i-p;
     for(int i=n;i<n+p+1;i++)
-        knots[i]=p;
+        knots[i]=n-p;
     QVector<QPoint> pp;
     painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    for(double u=knots[p];u<knots[points.size()+1];u+=0.01){
+    //u定义域在[up,um-p-1]，即[up,un]
+    for(double u=knots[p];u<knots[points.size()];u+=0.01){
         pp.clear();
         //找到当前u在哪个节点区间内
         int k=std::distance(knots.begin(),std::upper_bound(knots.begin(),knots.end(),u))-1;
         //区间[uk,uk+1)对应的控制顶点[Pk-p,Pk]
         for(int i=k-p;i<k+1;i++)
             pp.push_back(points[i]);
+        //外层for是三角形从左向右
+        //内层for是每一列自上而下
+        //pp数组每次自后向前更新
         for(int r=1;r<=p;r++){
             for (int i = k,j=p;i >= k - p+r;--i,--j) {
                 double alpha = u - knots[i];
@@ -220,4 +225,14 @@ void Widget::on_radioButton_2_toggled(bool checked)
             degree=i;
         update();
     }
+}
+
+void Widget::on_pushButton_3_clicked()
+{
+    bool ok;
+    int i = QInputDialog::getInt(this, tr("change degree"),
+                                 tr("input degree: "), 6, 0, 100, 1, &ok);
+    if (ok)
+        degree=i;
+    update();
 }

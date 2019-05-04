@@ -44,6 +44,8 @@ private slots:
 
     void on_radioButton_2_toggled(bool checked);
 
+    void on_pushButton_3_clicked();
+
 private:
     Ui::Widget *ui;
     int numPoints;//记录输出顶点个数

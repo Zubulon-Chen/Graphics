@@ -16,31 +16,38 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>720</x>
-     <y>40</y>
-     <width>221</width>
-     <height>201</height>
+     <x>770</x>
+     <y>50</y>
+     <width>139</width>
+     <height>228</height>
     </rect>
    </property>
    <property name="title">
     <string>控制面板</string>
    </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
      <widget class="QPushButton" name="pushButton">
       <property name="text">
        <string>输入点个数</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item>
      <widget class="QPushButton" name="pushButton_2">
       <property name="text">
        <string>删除点</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="text">
+       <string>修改B样条次数</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="title">
        <string>曲线类型</string>
