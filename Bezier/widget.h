@@ -19,7 +19,12 @@
 namespace Ui {
 class Widget;
 }
-
+struct point
+{
+    double x,y;
+    point() {}
+    point(double xx,double yy):x(xx),y(yy) {}
+};
 class Widget : public QWidget
 {
     Q_OBJECT

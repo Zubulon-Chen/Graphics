@@ -30,31 +30,33 @@ void Widget::drawLines(const QVector<QPoint> &points,QPainter &painter)
 
 void Widget::drawBezier(QPainter &painter)
 {
-    QVector<QPoint> ppp=points;
     QPoint prev;
     bool first=true;
-    QVector<QPoint> pp;
+
     painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    for(double t=0.0;t<=1.0;t+=0.01){
-        points=ppp;
-        while(points.size()>1){
-            for(int i=0;i<points.size()-1;i++){
-                pp.push_back(points[i]*(1-t)+points[i+1]*t);
+    for(double t=0.0;t<=1.0;t+=0.001){
+        QVector<point> pp;
+        for(auto &p:points){
+            pp.push_back(point(p.x()*1.0,p.y()*1.0));
+        }
+        //在迭代时用double记录值，否则多次迭代后误差很大
+        for(int k=1;k<numPoints;k++){
+            for(int i=0;i<numPoints-k;i++){
+                pp[i].x=(1-t)*pp[i].x+t*pp[i+1].x;
+                pp[i].y=(1-t)*pp[i].y+t*pp[i+1].y;
             }
-            points=pp;
-            pp.clear();
         }
         if(first){
-            prev=points.front();
+            prev.setX(round(pp[0].x));
+            prev.setY(round(pp[0].y));
             first=false;
         }
         else{
-            painter.drawLine(prev,points.front());
-            prev=points.front();
+            QPoint tmp(round(pp[0].x),round(pp[0].y));
+            painter.drawLine(prev,tmp);
+            prev=tmp;
         }
-        //        painter.drawPoint(points.front());
     }
-    points=ppp;
 }
 
 void Widget::drawB_Spline(QPainter &painter)
@@ -77,7 +79,7 @@ void Widget::drawB_Spline(QPainter &painter)
         knots[i]=i-p;
     for(int i=n;i<n+p+1;i++)
         knots[i]=n-p;
-    QVector<QPoint> pp;
+    QVector<point> pp;
     painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     //u定义域在[up,um-p-1]，即[up,un]
     for(double u=knots[p];u<knots[points.size()];u+=0.001){
@@ -86,7 +88,7 @@ void Widget::drawB_Spline(QPainter &painter)
         int k=std::distance(knots.begin(),std::upper_bound(knots.begin(),knots.end(),u))-1;
         //区间[uk,uk+1)对应的控制顶点[Pk-p,Pk]
         for(int i=k-p;i<k+1;i++)
-            pp.push_back(points[i]);
+            pp.push_back(point(points[i].x()*1.0,points[i].y()*1.0));
         //外层for是三角形从左向右
         //内层for是每一列自上而下
         //pp数组每次自后向前更新
@@ -95,18 +97,21 @@ void Widget::drawB_Spline(QPainter &painter)
                 double alpha = u - knots[i];
                 double dev = (knots[i+p+1-r]-knots[i]);
                 alpha = (dev !=0)? alpha / dev : 0;
-                pp[j] = (1.0 - alpha)*pp[j - 1] + alpha * pp[j];
+
+                pp[j].x = (1.0 - alpha)*pp[j - 1].x + alpha * pp[j].x;
+                pp[j].y = (1.0 - alpha)*pp[j - 1].y + alpha * pp[j].y;
             }
         }
         if(first){
-            prev=pp.back();
+            prev.setX(round(pp.back().x));
+            prev.setY(round(pp.back().y));
             first=false;
         }
         else{
-            painter.drawLine(prev,pp.back());
-            prev=pp.back();
+            QPoint tmp(round(pp.back().x),round(pp.back().y));
+            painter.drawLine(prev,tmp);
+            prev=tmp;
         }
-        //        painter.drawPoint(pp.back());
     }
 }
 
@@ -149,6 +154,7 @@ void Widget::mousePressEvent(QMouseEvent *event)
                         &&abs(event->pos().y()-points[i].y())<=5){
                     setCursor(Qt::CrossCursor);
                     points.remove(i);
+                    numPoints--;
                     delete_point=false;
                     update();
                     break;
