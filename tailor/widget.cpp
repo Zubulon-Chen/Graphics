@@ -14,6 +14,9 @@ Widget::Widget(QWidget *parent) :
     xr=2*xl;
     yb=ht/3;
     yt=yb*2;
+    inputOver=false;
+    cc=LINE;
+    tp=RANDOM;
 }
 
 Widget::~Widget()
@@ -63,14 +66,22 @@ bool Widget::clip(int p, int q, double &u1, double &u2)
     return true;
 }
 
-void Widget::line_clip_test(QPainter &painter)
+void Widget::line_clip(QPainter &painter)
 {
     //生成一些随机线段，测试LB算法
     painter.setRenderHint(QPainter::Antialiasing, true);
-    const int numLines=80;
-    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
-    for(int i=0; i<numLines; i++) {
-        LB_lineClip(qrand()%wid,qrand()%wid,qrand()%ht,qrand()%ht,&painter);
+    if(tp==RANDOM){
+        const int numLines=80;
+        qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
+        for(int i=0; i<numLines; i++) {
+            LB_lineClip(qrand()%wid,qrand()%wid,qrand()%ht,qrand()%ht,&painter);
+        }
+    }
+    else{
+        for(int i=0;i<linePoints.size()-1;i+=2){
+            LB_lineClip(linePoints[i].x(),linePoints[i].y(),
+                        linePoints[i+1].x(),linePoints[i+1].y(),&painter);
+        }
     }
 }
 
@@ -146,12 +157,24 @@ QPoint Widget::getIntersect(QPoint a, QPoint b,bool ina, edges e)
     }
 }
 
-void Widget::polygen_clip_test(QPainter &painter)
+void Widget::polygen_clip(QPainter &painter)
 {
-    //生成随机点，构成多边形
-    QVector<QPoint> vertices = { QPoint(350, 450), QPoint(600, 150), QPoint(700, 400),
-                                 QPoint(750, 550), QPoint(650, 800), QPoint(500, 800)
-                               };
+    QVector<QPoint> vertices;
+    if(tp==RANDOM){
+        vertices= { QPoint(350, 450), QPoint(600, 150), QPoint(700, 400),
+                    QPoint(750, 550), QPoint(650, 800), QPoint(500, 800) };
+    }
+    else{
+        if(inputOver)
+            vertices=polygenPoints;
+        else{
+            painter.setPen(QPen(Qt::red, 10, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
+            for(auto p:polygenPoints){
+                painter.drawPoint(p);
+            }
+            return;
+        }
+    }
     //将原图形以灰色虚线画出
     painter.setPen(QPen(Qt::gray, 5, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin));
     for(int i=0;i<vertices.size();i++){
@@ -187,10 +210,52 @@ void Widget::paintEvent(QPaintEvent *)
     painter.drawLine(2*ww,0,2*ww,ht);
     painter.drawLine(0,hh,wid,hh);
     painter.drawLine(0,2*hh,wid,2*hh);
+    if(cc==LINE)
+        line_clip(painter);
+    else
+        polygen_clip(painter);
+}
 
-    //线段裁剪测试
-//        line_clip_test(painter);
-    //多边形裁剪测试
-    polygen_clip_test(painter);
+void Widget::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button()==Qt::LeftButton&&tp==INPUT){
+        if(cc==POLYGEN){
+            polygenPoints.push_back(event->pos());
+            update();
+        }
+        else{
+            linePoints.push_back(event->pos());
+            update();
+        }
+    }
+}
 
+void Widget::on_comboBox_currentIndexChanged(const QString &arg1)
+{
+    inputOver=false;
+    linePoints.clear();
+    polygenPoints.clear();
+    if(arg1=="random")
+        tp=RANDOM;
+    else
+        tp=INPUT;
+   update();
+}
+
+void Widget::on_comboBox_2_currentIndexChanged(const QString &arg1)
+{
+    inputOver=false;
+    linePoints.clear();
+    polygenPoints.clear();
+    if(arg1=="line")
+        cc=LINE;
+    else
+        cc=POLYGEN;
+   update();
+}
+
+void Widget::on_pushButton_clicked()
+{
+    inputOver=true;
+    update();
 }
