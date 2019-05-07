@@ -14,6 +14,7 @@
 #include <QInputDialog>
 #include <QDebug>
 #include <algorithm>
+#include <QMessageBox>
 
 namespace Ui {
 class Widget;

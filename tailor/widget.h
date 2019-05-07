@@ -10,17 +10,6 @@
 namespace Ui {
 class Widget;
 }
-//struct QPoint
-//{
-//    int x,y;
-//    QPoint() {}
-//    QPoint(int xx,int yy):x(xx),y(yy) {}
-//};
-//struct edge
-//{
-//    int x1,y1,x2,y2;
-//    edge() {}
-//};
 
 enum edges{LEFT,RIGHT,UP,DOWN};
 class Widget : public QWidget

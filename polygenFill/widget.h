@@ -17,6 +17,11 @@ struct edge
     double dx;//斜率的倒数，y的一个增量对应的x的增量
     edge() {}
     edge(int yy,double xx,double dd):ymax(yy),xmin(xx),dx(dd) {}
+    bool operator <(const edge& a) const{
+        if(xmin!=a.xmin)
+            return xmin<a.xmin;
+        return dx<a.dx;
+    }
 };
 
 struct point

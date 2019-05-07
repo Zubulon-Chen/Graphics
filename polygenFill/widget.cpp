@@ -59,20 +59,10 @@ void Widget::polygonScan(QPainter &painter)
     for(int i=miny;i<maxy;i++){
         //取出ET中当前扫描行的所有边并按x的递增顺序（若x相等则按dx的递增顺序）插入AET
         for(auto e:ET[i]){
-            bool inserted=false;
-            for(auto it=AET.begin();it!=AET.end();it++){
-                if(it->xmin>e.xmin||it->xmin==e.xmin&&it->dx>e.dx){
-                    AET.insert(it,e);
-                    inserted=true;
-                    break;
-                }
-            }
-            //不是在链表中插入则在链表尾插入
-            if(!inserted)
-                AET.push_back(e);
+            auto it=lower_bound(AET.begin(),AET.end(),e);
+            AET.insert(it,e);
         }
         //AET中的边两两配对并填色
-
         for(int j=0;j<AET.size()-1;j+=2){
             //一对之间的所有点着色
             for(int xx=AET[j].xmin;xx<=AET[j+1].xmin;xx++){

@@ -52,7 +52,7 @@ void Widget::drawBezier(QPainter &painter)
             painter.drawLine(prev,points.front());
             prev=points.front();
         }
-//        painter.drawPoint(points.front());
+        //        painter.drawPoint(points.front());
     }
     points=ppp;
 }
@@ -66,8 +66,8 @@ void Widget::drawB_Spline(QPainter &painter)
     QVector<int> knots(n+p+1);
     //均匀分布的节点
     //其中第一段和最后一段会缺失
-//    for(int i=0;i<knots.size();i++)
-//        knots[i]=i;
+    //    for(int i=0;i<knots.size();i++)
+    //        knots[i]=i;
     //clamped效果
     //第一个和最后一个节点重复度p+1
     //中间有n-p-1个节点均匀分布
@@ -80,7 +80,7 @@ void Widget::drawB_Spline(QPainter &painter)
     QVector<QPoint> pp;
     painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     //u定义域在[up,um-p-1]，即[up,un]
-    for(double u=knots[p];u<knots[points.size()];u+=0.01){
+    for(double u=knots[p];u<knots[points.size()];u+=0.001){
         pp.clear();
         //找到当前u在哪个节点区间内
         int k=std::distance(knots.begin(),std::upper_bound(knots.begin(),knots.end(),u))-1;
@@ -106,7 +106,7 @@ void Widget::drawB_Spline(QPainter &painter)
             painter.drawLine(prev,pp.back());
             prev=pp.back();
         }
-//        painter.drawPoint(pp.back());
+        //        painter.drawPoint(pp.back());
     }
 }
 
@@ -221,8 +221,15 @@ void Widget::on_radioButton_2_toggled(bool checked)
         bool ok;
         int i = QInputDialog::getInt(this, tr("Input degree"),
                                      tr("input degree: "), 4, 0, 100, 1, &ok);
-        if (ok)
-            degree=i;
+        if (ok){
+            //输入的阶数应当小于等于顶点数量，否则u定义域为空
+            if(i<=numPoints)
+                degree=i;
+            else{
+                QMessageBox::warning(NULL, "warning", "Please input right k",
+                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+            }
+        }
         update();
     }
 }
@@ -231,8 +238,15 @@ void Widget::on_pushButton_3_clicked()
 {
     bool ok;
     int i = QInputDialog::getInt(this, tr("change degree"),
-                                 tr("input degree: "), 6, 0, 100, 1, &ok);
-    if (ok)
-        degree=i;
+                                 tr("input degree: "), 4, 0, 100, 1, &ok);
+    if (ok){
+        //输入的阶数应当小于等于顶点数量，否则u定义域为空
+        if(i<=numPoints)
+            degree=i;
+        else{
+            QMessageBox::warning(NULL, "warning", "Please input right k",
+                                 QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        }
+    }
     update();
 }
