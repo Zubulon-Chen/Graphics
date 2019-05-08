@@ -1,14 +1,13 @@
 #include "widget.h"
 #include "ui_widget.h"
 
-Widget::Widget(QWidget *parent, QVector<point> vv, int w, int h) :
+Widget::Widget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Widget),
-    vertices(vv),winWidth(w),winHeight(h)
+    ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    setFixedSize(winWidth,winHeight);
-    ET.resize(winHeight);
+    ET.resize(this->height());
+    ss=INPUT;
 }
 
 Widget::~Widget()
@@ -65,9 +64,7 @@ void Widget::polygonScan(QPainter &painter)
         //AET中的边两两配对并填色
         for(int j=0;j<AET.size()-1;j+=2){
             //一对之间的所有点着色
-            for(int xx=AET[j].xmin;xx<=AET[j+1].xmin;xx++){
-                painter.drawPoint(xx,i);
-            }
+            painter.drawLine(AET[j].xmin,i,AET[j+1].xmin,i);
         }
         //删除AET中满足y=ymax的边
         auto it=AET.begin();
@@ -90,5 +87,42 @@ void Widget::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setPen(Qt::red);
-    polygonScan(painter);
+    if(ss==INPUT){
+        if(vertices.empty())
+            return;
+        painter.setPen(QPen(Qt::red,10));
+        for(auto p:vertices){
+            painter.drawPoint(p.x,p.y);
+        }
+    }
+    else if(ss==OVER){
+        polygonScan(painter);
+    }
+}
+
+void Widget::on_input_Button_clicked()
+{
+    vertices.clear();
+    for(auto& v:ET){
+        v.clear();
+    }
+    AET.clear();
+    ss=INPUT;
+    update();
+}
+
+void Widget::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button()==Qt::LeftButton){
+        if(ss==INPUT){
+            vertices.push_back(point(event->pos().x(),event->pos().y()));
+            update();
+        }
+    }
+}
+
+void Widget::on_over_Button_clicked()
+{
+    ss=OVER;
+    update();
 }
