@@ -15,7 +15,7 @@ class Widget;
 struct edge
 {
     int ymax;//上端点的y值
-    double xmin;//左端点的x值
+    double xmin;//下端点的x值
     double dx;//斜率的倒数，y的一个增量对应的x的增量
     edge() {}
     edge(int yy,double xx,double dd):ymax(yy),xmin(xx),dx(dd) {}

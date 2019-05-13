@@ -28,10 +28,8 @@ void Widget::polygonScan(QPainter &painter)
     for(int i=0;i<vertices.size();i++){
         //当前处理的边是12
         //但是同时取出三条边进行判断
-        int x0 = vertices[(i - 1 + vertices.size()) % vertices.size()].x;
         int x1 = vertices[i].x;
         int x2 = vertices[(i + 1) % vertices.size()].x;
-        int x3 = vertices[(i + 2) % vertices.size()].x;
         int y0 = vertices[(i - 1 + vertices.size()) % vertices.size()].y;
         int y1 = vertices[i].y;
         int y2 = vertices[(i + 1) % vertices.size()].y;
@@ -46,6 +44,8 @@ void Widget::polygonScan(QPainter &painter)
         float dx = (x1 - x2) * 1.0f / (y1 - y2);
         //奇点特殊处理，若点2->1->0的y坐标单调递减则y1为奇点，若点1->2->3的y坐标单调递减则y2为奇点
         //将非极值顶点断开一个像素
+        //此时在该点的水平线的填充会由下面条边完成
+        //倘若不进行此步处理，则该点处的上下两条边都加入，当前时刻会AET中会有三个项
         if (((y1 < y2) && (y1 > y0)) || ((y2 < y1) && (y2 > y3)))
         {
             ymin++;
